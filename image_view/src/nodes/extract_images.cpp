@@ -68,7 +68,7 @@ public:
     ros::NodeHandle local_nh("~");
 
     std::string format_string;
-    local_nh.param("filename_format", format_string, std::string("frame%04i.jpg"));
+    local_nh.param("filename_format", format_string, std::string("frame%04i_%d.jpg"));
     filename_format_.parse(format_string);
 
     local_nh.param("sec_per_frame", sec_per_frame_, 0.1);
@@ -114,7 +114,11 @@ public:
       _time = ros::Time::now().toSec();
 
       if (!image.empty()) {
-        std::string filename = (filename_format_ % count_).str();
+        std::string filename = (filename_format_ % count_ % msg->header.stamp.toNSec()).str();
+        //std::stringstream ss;
+        //ss << msg->header.stamp.toNSec() << "_" <<filename;
+        //ss << filename << "_" << msg->header.stamp.toNSec();
+        //filename = ss.str();
 
 #if !defined(_VIDEO)
         cv::imwrite(filename, image);
